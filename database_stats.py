@@ -7,7 +7,7 @@ import sqlite3
 
 from sqlite3 import Error
 from time import gmtime, strftime
-conn = None
+conn = None # Variable to use as connection with the database
 
 # Function to check the db connection.
 # Kinda not needed if you ask me.
@@ -37,7 +37,7 @@ def add_data(Patient_ID, name, Measurement_ML):
 
 # Delete a patient by ID
 # Parameter Patient_ID: The ID of a patient
-def delete_ID(Patient_ID):
+def delete_Patient_ID(Patient_ID):
     condition = 'DELETE FROM PATIENT_STATS WHERE Patient_ID=?' # select the condition for patient_id
     conn.execute(condition, (Patient_ID,)) # execute the condition
 
@@ -47,8 +47,8 @@ def delete_Name(Name):
     condition = 'DELETE FROM PATIENT_STATS WHERE Patient_Name=?' # select the name
     conn.execute(condition, (Name,)) # execute the condition
 
-# Delete a patient by name
-# Parameter name: The name of a patient
+# Delete a patient by Measurement
+# Parameter Measurement: The measured amount of urine in ml
 def delete_Measurement(Measurement):
     condition = 'DELETE FROM PATIENT_STATS WHERE Measurement_ML=?' # select the name
     conn.execute(condition, (Measurement,)) # execute the condition
@@ -57,6 +57,36 @@ def delete_Measurement(Measurement):
 def delete_Latest():
     condition = 'DELETE FROM PATIENT_STATS WHERE ID=(SELECT MAX(ID) FROM PATIENT_STATS)' # select the highest ID which is the latest insert
     conn.execute(condition,) # execute the condition
+
+# Untested function
+def delete_All():
+    condition = 'DELETE FROM PATIENT_STATS)' # select the highest ID which is the latest insert
+    conn.execute(condition,) # execute the condition
+
+# Get all rows with Patient_ID
+# Parameter Patient_ID: The ID of a patient
+def get_Patient_ID(Patient_ID):
+    data = conn.execute("SELECT * FROM PATIENT_STATS WHERE Patient_ID=?", (Patient_ID,)) # retrieve all rows with Patient_ID
+    return data
+
+# Get all rows with Patient_Name
+# Parameter Patient_Name: The name of a patient
+def get_Patient_Name(Patient_Name):
+    data = conn.execute("SELECT * FROM PATIENT_STATS WHERE Patient_Name=?", (Patient_Name,)) # retrieve all rows with Patient_ID
+    return data
+
+# Get all rows with Measurement
+# Parameter Measurement: The measured amount of urine in ml
+def get_Measurement(Measurement):
+    data = conn.execute("SELECT * FROM PATIENT_STATS WHERE Measurement_ML=?", (Measurement,)) # retrieve all rows with Patient_ID
+    return data
+
+# Get all measurements in the past 24 hours from given Patient ID.
+# Parameter Patient_ID: The ID of a patient
+def get_24hours(Patient_ID):
+    data = conn.execute("SELECT * FROM PATIENT_STATS WHERE Timestamp > datetime('now', '-1 day') AND Patient_ID=?", (Patient_ID,)) # retrieve all rows in the past 24hrs with Patient_ID
+    return data
+
 
 
 # IDK what to do with this one
@@ -103,24 +133,32 @@ conn = sqlite3.connect(r"db_test.db") # Connect to the database
 add_data(2, 'Jesse', 29.7)
 #==================================================
 #Print before something
-with conn:
-    data = conn.execute("SELECT * FROM PATIENT_STATS")
-    print("before:")
-    for row in data:
-        print(row)
+if __debug__:
+    with conn:
+        data = conn.execute("SELECT * FROM PATIENT_STATS")
+        print("before:")
+        for row in data:
+            print(row)
+        print("\n")
 #==================================================
 #Do something
 #add_data(2, 'Jesse', 28.1)
 #delete_Name('Onurcan')
-delete_Measurement(29.7)
+#delete_Measurement(29.7)
+#get_Patient_ID(1)
+test = get_24hours(2)
+for row in test:
+    print(row)
 #==================================================
 #Print after something
-with conn:
-    data = conn.execute("SELECT * FROM PATIENT_STATS")
-    #data = conn.execute("SELECT * FROM PATIENT_STATS WHERE measurement_ml >= 23")
-    print("\n\nafter:")
-    for row in data:
-        print(row)
+if __debug__:
+    with conn:
+        data = conn.execute("SELECT * FROM PATIENT_STATS")
+        #data = conn.execute("SELECT * FROM PATIENT_STATS WHERE measurement_ml >= 23")
+        print("\n\nafter:")
+        for row in data:
+            print(row)
+        
 #==================================================
 
 
