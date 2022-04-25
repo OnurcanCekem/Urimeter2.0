@@ -128,14 +128,25 @@ plt.show()
 plt.plot_date(x, y)
 """
 
+# example values for testing
+import random
+x = [dt.datetime.now() + dt.timedelta(hours=i) for i in range(24)]
+y = [i+random.gauss(0,1) for i,_ in enumerate(x)]
+
 # plot in Tkinter
-f = Figure(figsize=(5,5), dpi=100)
-a = f.add_subplot(111)
-a.plot([1,2,3,4,5,6,7,8],[5,6,1,3,8,9,3,5])
+f = Figure(figsize=(10,5), dpi=100)
+a = f.add_subplot()
+
+# graph settings
+a.set_title('Metingen afgelopen 24 uur') # set title for graph
+a.set_ylabel('volume (ml)') # set label for y-axis
+a.set_ylim([0, 50]) # set y-limit to up to 50 ml
+a.set_xlim([dt.datetime.now(), dt.datetime.now() + dt.timedelta(hours=24)]) # set x-limit to up to 24 hours
+
+a.plot(x,y)
 canvas = FigureCanvasTkAgg(f, master=root)
 canvas.draw()
 canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-
 
 toolbar = NavigationToolbar2Tk(canvas, root)
 toolbar.update()
