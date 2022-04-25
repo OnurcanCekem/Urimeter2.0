@@ -11,7 +11,7 @@ import numpy as np
 
 # database imports
 import sqlite3
-from sqlite3 import Error
+from sqlite3 import Error, Timestamp
 from time import gmtime, strftime
 conn = None # Variable to use as connection with the database
 
@@ -91,7 +91,7 @@ def get_Measurement(Measurement):
 # Get all measurements in the past 24 hours from given Patient ID.
 # Parameter Patient_ID: The ID of a patient
 def get_24hours(Patient_ID):
-    data = conn.execute("SELECT * FROM PATIENT_STATS WHERE Timestamp > datetime('now', '-1 day') AND Patient_ID=?", (Patient_ID,)) # retrieve all rows in the past 24hrs with Patient_ID
+    data = conn.execute("SELECT * FROM PATIENT_STATS WHERE Timestamp > datetime('now', '-1 hour') AND Patient_ID=?", (Patient_ID,)) # retrieve all rows in the past 24hrs with Patient_ID
     return data
 
 
@@ -106,11 +106,25 @@ def _quit():
 
 conn = sqlite3.connect(r"db_test.db") # Connect to the database
 # ==============================================================
-data = get_24hours(2)
-for row in data:
-    print(row)
+data_base = get_24hours(2)
+x = []
+y = []
+#strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
+import time
+for row in data_base:
+    x.append(row[3])
+    y.append(row[4])
+    print(row) # print all elements in row
+    print(str(row[3]) + " " + str(row[4])) # print only 'timestamp' and 'measurement'
 
+""""
+for value in x:
+    print(value)
+"""
+for value in y:
+    print(value)
+print(dt.datetime.now())
 
 # plot in Matplotlib
 """
@@ -130,9 +144,11 @@ plt.plot_date(x, y)
 
 # example values for testing
 import random
-x = [dt.datetime.now() + dt.timedelta(hours=i) for i in range(24)]
-y = [i+random.gauss(0,1) for i,_ in enumerate(x)]
-
+#x = [dt.datetime.now() - dt.timedelta(minutes=i) for i in range(24)]
+x = [dt.datetime.now() - dt.timedelta(minutes=i) for i in range(6,0,-1)]
+#y = [i+random.gauss(0,1) for i,_ in enumerate(x)]
+for row in x:
+    print(row)
 # plot in Tkinter
 f = Figure(figsize=(10,5), dpi=100)
 a = f.add_subplot()
@@ -140,8 +156,9 @@ a = f.add_subplot()
 # graph settings
 a.set_title('Metingen afgelopen 24 uur') # set title for graph
 a.set_ylabel('volume (ml)') # set label for y-axis
+a.set_xlabel('Tijd (maand-dag uur)') # set label for x-axis
 a.set_ylim([0, 50]) # set y-limit to up to 50 ml
-a.set_xlim([dt.datetime.now(), dt.datetime.now() + dt.timedelta(hours=24)]) # set x-limit to up to 24 hours
+a.set_xlim([dt.datetime.now() - dt.timedelta(minutes=24), dt.datetime.now()]) # set x-limit to up to 24 hours
 
 a.plot(x,y)
 canvas = FigureCanvasTkAgg(f, master=root)

@@ -7,6 +7,7 @@ import sqlite3
 
 from sqlite3 import Error
 from time import gmtime, strftime
+import datetime
 conn = None # Variable to use as connection with the database
 
 # Function to check the db connection.
@@ -28,7 +29,8 @@ def create_connection(db_file):
 # Parameter name: The name of a patient
 # Parameter Measurement_ML: The current measured urine
 def add_data(Patient_ID, name, Measurement_ML):
-    data_add = (Patient_ID, name, strftime("%Y-%m-%d %H:%M:%S", gmtime()), Measurement_ML) # create case to store data
+    #data_add = (Patient_ID, name, strftime("%Y-%m-%d %H:%M:%S", gmtime()), Measurement_ML) # create case to store data
+    data_add = (Patient_ID, name, datetime.datetime.now(), Measurement_ML) # create case to store data
     conn.execute('INSERT OR IGNORE INTO PATIENT_STATS (Patient_ID, Patient_Name, Timestamp, Measurement_ML) values(?, ?, ?, ?)', data_add) # add data in database
     
     #Test variable
