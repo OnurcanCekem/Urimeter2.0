@@ -112,43 +112,37 @@ y = []
 #strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
 import time
+count = 0
 for row in data_base:
-    x.append(row[3])
+    count+=1
+    doetje = row[3]
+    x_time = dt.datetime.strptime(doetje,"%Y-%m-%d %H:%M:%S")
+    x.append(x_time)
+    #x = dt.datetime(row[3])
     y.append(row[4])
     print(row) # print all elements in row
-    print(str(row[3]) + " " + str(row[4])) # print only 'timestamp' and 'measurement'
+    print(str(row[3]) + " and " + str(row[4])) # print only 'timestamp' and 'measurement'
 
-""""
+
+print("\nx vals: ")
 for value in x:
     print(value)
-"""
+
+print("\nY vals: ")
 for value in y:
     print(value)
-print(dt.datetime.now())
 
-# plot in Matplotlib
-"""
-import random
-# make up some data
-x = [dt.datetime.now() + dt.timedelta(hours=i) for i in range(24)]
-y = [i+random.gauss(0,1) for i,_ in enumerate(x)]
-
-# plot
-plt.scatter(x,y)
-# beautify the x-labels
-plt.gcf().autofmt_xdate()
-
-plt.show()
-plt.plot_date(x, y)
-"""
 
 # example values for testing
 import random
-#x = [dt.datetime.now() - dt.timedelta(minutes=i) for i in range(24)]
-x = [dt.datetime.now() - dt.timedelta(minutes=i) for i in range(6,0,-1)]
+#x = [dt.datetime.now() - dt.timedelta(minutes=i) for i in range(24)] # original one
+#x = [dt.datetime.now() - dt.timedelta(minutes=i) for i in range(count,0,-1)]
 #y = [i+random.gauss(0,1) for i,_ in enumerate(x)]
+
+print("\nx vals: ")
 for row in x:
     print(row)
+
 # plot in Tkinter
 f = Figure(figsize=(10,5), dpi=100)
 a = f.add_subplot()
@@ -158,8 +152,15 @@ a.set_title('Metingen afgelopen 24 uur') # set title for graph
 a.set_ylabel('volume (ml)') # set label for y-axis
 a.set_xlabel('Tijd (maand-dag uur)') # set label for x-axis
 a.set_ylim([0, 50]) # set y-limit to up to 50 ml
-a.set_xlim([dt.datetime.now() - dt.timedelta(minutes=24), dt.datetime.now()]) # set x-limit to up to 24 hours
 
+# calculate time for limit
+time_max = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+time_minkek = dt.datetime.now() - dt.timedelta(minutes=24)
+time_min = time_minkek.strftime("%Y-%m-%d %H:%M:%S")
+print(time_min)
+
+#a.set_xlim([dt.datetime.now() - dt.timedelta(minutes=24), dt.datetime.now()]) # set x-limit to up to 24 hours
+#a.set_xlim([time_min, time_max]) # set x-limit to up to 24 hours
 a.plot(x,y)
 canvas = FigureCanvasTkAgg(f, master=root)
 canvas.draw()
@@ -175,6 +176,13 @@ button = tk.Button(master=root, text="Quit", command=_quit)
 button.pack(side=tk.BOTTOM)
 tk.mainloop()
 
+
+# If you put root.destroy() here, it will cause an error if the window is
+# closed with the window manager.
+# ==============================================================
+conn.close() # close connection with database
+
+# junk code
 """
 # Single line in one canvas
 f = Figure(figsize=(5,5), dpi=100)
@@ -196,7 +204,19 @@ button.pack(side=tk.BOTTOM)
 matplotlib.pyplot.plot_date(dates, y_values)
 tk.mainloop()
 """
-# If you put root.destroy() here, it will cause an error if the window is
-# closed with the window manager.
-# ==============================================================
-conn.close() # close connection with database
+
+# plot in Matplotlib
+"""
+import random
+# make up some data
+x = [dt.datetime.now() + dt.timedelta(hours=i) for i in range(24)]
+y = [i+random.gauss(0,1) for i,_ in enumerate(x)]
+
+# plot
+plt.scatter(x,y)
+# beautify the x-labels
+plt.gcf().autofmt_xdate()
+
+plt.show()
+plt.plot_date(x, y)
+"""
