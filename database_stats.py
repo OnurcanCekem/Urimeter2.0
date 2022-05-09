@@ -132,7 +132,6 @@ conn = sqlite3.connect(r"db_test.db") # Connect to the database
 # Add single data
 #data_add = (1, 1, 'Bob', strftime("%Y-%m-%d %H:%M:%S", gmtime()), 32.2) # create case to store data
 #conn.execute('INSERT INTO PATIENT_STATS (ID, Patient_ID, Patient_Name, Timestamp, Measurement_ML) values(?, ?, ?, ?, ?)', data_add) # add data in database
-add_data(2, 'Jesse', 31.7)
 
 #==================================================
 #Print before something
@@ -149,9 +148,12 @@ if __debug__:
 #delete_Name('Onurcan')
 #delete_Measurement(29.7)
 #get_Patient_ID(1)
+add_data(2, 'Jesse', 29.7)
+print("All items past 24 hours:")
 test = get_24hours(2)
 for row in test:
     print(row)
+print("New database item added, all good homie.")
 #==================================================
 #Print after something
 if __debug__:

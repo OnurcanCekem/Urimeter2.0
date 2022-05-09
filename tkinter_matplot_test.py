@@ -1,5 +1,6 @@
 # Testing tkinter with database
-
+import sys
+sys.path
 # matplotlib imports
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import (
@@ -91,7 +92,7 @@ def get_Measurement(Measurement):
 # Get all measurements in the past 24 hours from given Patient ID.
 # Parameter Patient_ID: The ID of a patient
 def get_24hours(Patient_ID):
-    data = conn.execute("SELECT * FROM PATIENT_STATS WHERE Timestamp > datetime('now', '-1 hour') AND Patient_ID=?", (Patient_ID,)) # retrieve all rows in the past 24hrs with Patient_ID
+    data = conn.execute("SELECT * FROM PATIENT_STATS WHERE Timestamp > datetime('now', '-1 day') AND Patient_ID=?", (Patient_ID,)) # retrieve all rows in the past 24hrs with Patient_ID
     return data
 
 
@@ -106,24 +107,23 @@ def _quit():
 
 conn = sqlite3.connect(r"db_test.db") # Connect to the database
 # ==============================================================
-data_base = get_24hours(2)
-x = []
-y = []
-#strftime("%Y-%m-%d %H:%M:%S", gmtime())
+data_base = get_24hours(2) # all database variables that are relevant for id = 2
+x = [] # x-axis data for graph
+y = [] # y-axis data for graph
 
-import time
-count = 0
+import time # import time
 for row in data_base:
-    count+=1
-    doetje = row[3]
-    x_time = dt.datetime.strptime(doetje,"%Y-%m-%d %H:%M:%S")
-    x.append(x_time)
-    #x = dt.datetime(row[3])
-    y.append(row[4])
-    print(row) # print all elements in row
-    print(str(row[3]) + " and " + str(row[4])) # print only 'timestamp' and 'measurement'
+    Timestamp_db = row[3] # index 3 = timestamp
+    Timestamp_converted = dt.datetime.strptime(Timestamp_db,"%Y-%m-%d %H:%M:%S") # Convert datetime to custom format, else it's not equal to datetime from xlimit for unknown reasons (data type?)
+    x.append(Timestamp_converted) # add timestamp
+    y.append(row[4]) # add volume ; index 4 = volume (ml)
+    
+    #debug prints
+    #print(row) # print all elements in row
+    #print(str(row[3]) + " and " + str(row[4])) # print only 'timestamp' and 'measurement'
 
 
+#debug print all values in x and y
 print("\nx vals: ")
 for value in x:
     print(value)
@@ -134,34 +134,33 @@ for value in y:
 
 
 # example values for testing
-import random
+# code to randomly generate values for the past day
+#import random
 #x = [dt.datetime.now() - dt.timedelta(minutes=i) for i in range(24)] # original one
-#x = [dt.datetime.now() - dt.timedelta(minutes=i) for i in range(count,0,-1)]
 #y = [i+random.gauss(0,1) for i,_ in enumerate(x)]
 
-print("\nx vals: ")
-for row in x:
-    print(row)
-
-# plot in Tkinter
+# create plot in Tkinter
 f = Figure(figsize=(10,5), dpi=100)
-a = f.add_subplot()
+graph = f.add_subplot()
 
 # graph settings
-a.set_title('Metingen afgelopen 24 uur') # set title for graph
-a.set_ylabel('volume (ml)') # set label for y-axis
-a.set_xlabel('Tijd (maand-dag uur)') # set label for x-axis
-a.set_ylim([0, 50]) # set y-limit to up to 50 ml
+graph.set_title('Metingen afgelopen 24 uur') # set title for graph
+graph.set_ylabel('volume (ml)') # set label for y-axis
+graph.set_xlabel('Tijd (maand-dag uur)') # set label for x-axis
+graph.set_ylim([0, 50]) # set y-limit to up to 50 ml
+graph.grid(True)
 
 # calculate time for limit
 time_max = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-time_minkek = dt.datetime.now() - dt.timedelta(minutes=24)
-time_min = time_minkek.strftime("%Y-%m-%d %H:%M:%S")
-print(time_min)
+time_min = dt.datetime.now() - dt.timedelta(hours=24)
+time_min_converted = time_min.strftime("%Y-%m-%d %H:%M:%S") # Convert datetime to custom format
+print("Time_min: " + time_min_converted)
 
-#a.set_xlim([dt.datetime.now() - dt.timedelta(minutes=24), dt.datetime.now()]) # set x-limit to up to 24 hours
-#a.set_xlim([time_min, time_max]) # set x-limit to up to 24 hours
-a.plot(x,y)
+graph.set_xlim([dt.datetime.now() - dt.timedelta(hours=24), dt.datetime.now()]) # set x-limit to up to 24 hours
+#a.set_xlim([dt.datetime.now() - dt.timedelta(minutes=24), dt.datetime.now()]) # uncomment for 24 minutes version
+
+# Start plotting
+graph.plot(x,y)
 canvas = FigureCanvasTkAgg(f, master=root)
 canvas.draw()
 canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
