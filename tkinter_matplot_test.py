@@ -8,6 +8,7 @@ from matplotlib.backends.backend_tkagg import (
 # Implement the default Matplotlib key bindings.
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
+from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 import numpy as np
 
 # database imports
@@ -148,7 +149,11 @@ graph.set_title('Metingen afgelopen 24 uur') # set title for graph
 graph.set_ylabel('volume (ml)') # set label for y-axis
 graph.set_xlabel('Tijd (maand-dag uur)') # set label for x-axis
 graph.set_ylim([0, 50]) # set y-limit to up to 50 ml
-graph.grid(True)
+#graph.xaxis.set_major_locator(MultipleLocator(20))
+
+graph.grid(b=True, which='major', color='#666666', linestyle='-') # enable grid
+graph.minorticks_on()
+graph.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2) # enable grid
 
 # calculate time for limit
 time_max = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
