@@ -8,7 +8,9 @@ from matplotlib.backends.backend_tkagg import (
 # Implement the default Matplotlib key bindings.
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
+
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
+import matplotlib.dates as mdates
 import numpy as np
 
 # database imports
@@ -149,19 +151,30 @@ graph.set_title('Metingen afgelopen 24 uur') # set title for graph
 graph.set_ylabel('volume (ml)') # set label for y-axis
 graph.set_xlabel('Tijd (maand-dag uur)') # set label for x-axis
 graph.set_ylim([0, 50]) # set y-limit to up to 50 ml
-#graph.xaxis.set_major_locator(MultipleLocator(20))
+graph.set_xlim([dt.datetime.now() - dt.timedelta(hours=24), dt.datetime.now()]) # set x-limit to up to 24 hours
 
-graph.grid(b=True, which='major', color='#666666', linestyle='-') # enable grid
-graph.minorticks_on()
-graph.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2) # enable grid
+#Debug time
+#time_max = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#time_min = dt.datetime.now() - dt.timedelta(hours=24)
+#time_min_converted = time_min.strftime("%Y-%m-%d %H:%M:%S") # Convert datetime to custom format
+#print("Time_min: " + time_min_converted)
+
+#grid v2
+graph.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d %H")) # recognize grid in date
+graph.xaxis.set_minor_locator(MultipleLocator(1/24)) # minor line each hour
+graph.yaxis.set_major_locator(MultipleLocator(10)) # each 10 ml major line
+graph.yaxis.set_minor_locator(MultipleLocator(2)) # each 2 ml minor line
+graph.xaxis.grid(True,'minor',linewidth=0.5) # enable x-axis minor line
+graph.yaxis.grid(True,'minor',linewidth=0.5) # enable y-axis minor line
+graph.xaxis.grid(True,'major',linewidth=2) # enable x-axis major line
+graph.yaxis.grid(True,'major',linewidth=2) # enable y-axis major line
+
+#grid v1
+#graph.grid(b=True, which='major', color='#666666', linestyle='-') # enable grid
+#graph.minorticks_on()
+#graph.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2) # enable grid
 
 # calculate time for limit
-time_max = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-time_min = dt.datetime.now() - dt.timedelta(hours=24)
-time_min_converted = time_min.strftime("%Y-%m-%d %H:%M:%S") # Convert datetime to custom format
-print("Time_min: " + time_min_converted)
-
-graph.set_xlim([dt.datetime.now() - dt.timedelta(hours=24), dt.datetime.now()]) # set x-limit to up to 24 hours
 #a.set_xlim([dt.datetime.now() - dt.timedelta(minutes=24), dt.datetime.now()]) # uncomment for 24 minutes version
 
 # Start plotting
