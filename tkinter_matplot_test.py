@@ -23,6 +23,8 @@ conn = None # Variable to use as connection with the database
 import matplotlib.pyplot as plt
 import datetime as dt
 
+debug = 0; # 1 enables debug, 0 disables debug (1 for 24hours, 0 for 24 minutes)
+
 """
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%Y'))
 plt.gca().xaxis.set_major_locator(mdates.DayLocator())
@@ -160,6 +162,7 @@ graph.set_xlim([dt.datetime.now() - dt.timedelta(hours=24), dt.datetime.now()]) 
 #print("Time_min: " + time_min_converted)
 
 #grid v2
+
 graph.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d %H")) # recognize grid in date
 graph.xaxis.set_minor_locator(MultipleLocator(1/24)) # minor line each hour
 graph.yaxis.set_major_locator(MultipleLocator(10)) # each 10 ml major line
@@ -168,6 +171,11 @@ graph.xaxis.grid(True,'minor',linewidth=0.5) # enable x-axis minor line
 graph.yaxis.grid(True,'minor',linewidth=0.5) # enable y-axis minor line
 graph.xaxis.grid(True,'major',linewidth=2) # enable x-axis major line
 graph.yaxis.grid(True,'major',linewidth=2) # enable y-axis major line
+
+if debug:
+    graph.set_xlim([dt.datetime.now() - dt.timedelta(minutes=24), dt.datetime.now()]) # uncomment for 24-minute version
+    graph.xaxis.set_minor_locator(MultipleLocator(1/(24*60))) # uncomment for line each minutes
+
 
 #grid v1
 #graph.grid(b=True, which='major', color='#666666', linestyle='-') # enable grid
