@@ -7,6 +7,7 @@ import sqlite3
 
 from sqlite3 import Error
 from time import gmtime, strftime
+import datetime
 conn = None # Variable to use as connection with the database
 
 # Function to check the db connection.
@@ -28,7 +29,8 @@ def create_connection(db_file):
 # Parameter name: The name of a patient
 # Parameter Measurement_ML: The current measured urine
 def add_data(Patient_ID, name, Measurement_ML):
-    data_add = (Patient_ID, name, strftime("%Y-%m-%d %H:%M:%S", gmtime()), Measurement_ML) # create case to store data
+    #data_add = (Patient_ID, name, strftime("%Y-%m-%d %H:%M:%S", gmtime()), Measurement_ML) # create case to store data
+    data_add = (Patient_ID, name, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), Measurement_ML) # create case to store data
     conn.execute('INSERT OR IGNORE INTO PATIENT_STATS (Patient_ID, Patient_Name, Timestamp, Measurement_ML) values(?, ?, ?, ?)', data_add) # add data in database
     
     #Test variable
@@ -130,7 +132,7 @@ conn = sqlite3.connect(r"db_test.db") # Connect to the database
 # Add single data
 #data_add = (1, 1, 'Bob', strftime("%Y-%m-%d %H:%M:%S", gmtime()), 32.2) # create case to store data
 #conn.execute('INSERT INTO PATIENT_STATS (ID, Patient_ID, Patient_Name, Timestamp, Measurement_ML) values(?, ?, ?, ?, ?)', data_add) # add data in database
-add_data(2, 'Jesse', 29.7)
+
 #==================================================
 #Print before something
 if __debug__:
@@ -146,9 +148,12 @@ if __debug__:
 #delete_Name('Onurcan')
 #delete_Measurement(29.7)
 #get_Patient_ID(1)
+add_data(2, 'Jesse', 29.7)
+print("All items past 24 hours:")
 test = get_24hours(2)
 for row in test:
     print(row)
+print("New database item added, all good homie.")
 #==================================================
 #Print after something
 if __debug__:
