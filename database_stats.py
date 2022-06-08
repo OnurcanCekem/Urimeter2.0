@@ -148,7 +148,7 @@ if __debug__:
 #delete_Name('Onurcan')
 #delete_Measurement(29.7)
 #get_Patient_ID(1)
-add_data(2, 'Jesse', 29.7)
+add_data(2, 'Jesse', 27.5)
 print("All items past 24 hours:")
 test = get_24hours(2)
 for row in test:

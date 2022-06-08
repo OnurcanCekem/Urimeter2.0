@@ -23,7 +23,7 @@ conn = None # Variable to use as connection with the database
 import matplotlib.pyplot as plt
 import datetime as dt
 
-debug = 0; # 1 enables debug, 0 disables debug (1 for 24hours, 0 for 24 minutes)
+debug = 1; # 1 enables debug, 0 disables debug (1 for 24hours, 0 for 24 minutes)
 
 """
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%Y'))
@@ -34,6 +34,7 @@ plt.show()
 """
 
 root = tk.Tk() # create tkinter window
+root.geometry("800x480")
 root.wm_title("Embedding in Tk") # tkinter window title
 
 # Add data to database
