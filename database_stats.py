@@ -1,16 +1,18 @@
 """
- * tkinter_matplot_bar.py
+ * database_stats.py
  *
  *  Created on: April 4, 2022
  *  Last update: June 27, 2022
  *      Author: onurc
- *  Description: Line graph to illustrate volume measurements.
+ *  Description: Program with database functionality. Can uncomment for creating database and outputting debug values. 
+                 Mainly used for adding data to existing database.
  """
 # v1.1 2022-04-11: Changed table, added function to add data or delete data by id and name.
 # v1.2 2022-04-11: added function to delete most recent insert and data by measurement.
 
 
 import sqlite3
+import random # for RNGesus
 
 from sqlite3 import Error
 from time import gmtime, strftime
@@ -36,12 +38,12 @@ def create_connection(db_file):
 # Parameter name: The name of a patient
 # Parameter Measurement_ML: The current measured urine
 def add_data(Patient_ID, name, Measurement_ML):
-    #data_add = (Patient_ID, name, strftime("%Y-%m-%d %H:%M:%S", gmtime()), Measurement_ML) # create case to store data
     data_add = (Patient_ID, name, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), Measurement_ML) # create case to store data
     conn.execute('INSERT OR IGNORE INTO PATIENT_STATS (Patient_ID, Patient_Name, Timestamp, Measurement_ML) values(?, ?, ?, ?)', data_add) # add data in database
     
-    #Test variable
-    #data_add = ( 1, 'Bob', strftime("%Y-%m-%d %H:%M:%S", gmtime()), 31.2) # create case to store data
+    # Test variables create case to store data
+    #data_add = ( 1, 'Bob', strftime("%Y-%m-%d %H:%M:%S", gmtime()), 31.2) # without parameters
+    #data_add = (Patient_ID, name, strftime("%Y-%m-%d %H:%M:%S", gmtime()), Measurement_ML) # with parameters
 
 
 # Delete a patient by ID
@@ -96,8 +98,6 @@ def get_24hours(Patient_ID):
     data = conn.execute("SELECT * FROM PATIENT_STATS WHERE Timestamp > datetime('now', '-1 day') AND Patient_ID=?", (Patient_ID,)) # retrieve all rows in the past 24hrs with Patient_ID
     return data
 
-
-
 # IDK what to do with this one
 #if __name__ == '__main__':
     #create_connection(r"C:\sqlite\db\pythonsqlite.db")
@@ -106,7 +106,7 @@ def get_24hours(Patient_ID):
 
 conn = sqlite3.connect(r"db_test.db") # Connect to the database
 
-# Create database table
+# Uncomment to create database
 #with conn:
 #    conn.execute("""
 #        CREATE TABLE PATIENT_STATS (
@@ -118,25 +118,10 @@ conn = sqlite3.connect(r"db_test.db") # Connect to the database
 #             );
 #            """)
 
-
-# Insert multiple data to database
-#sql = 'INSERT INTO USER (hour, name, measurement_ml) values(?, ?, ?)'
-#data = [
-#    (1, 1, 'Bob', 1, 20.5),
-#    (2, 1, 'Bob', 2, 25.0),
-#    (3, 1, 'Bob', 3, 22.2),
-#    (4, 2, 'Jesse', 1, 21.2),
-#    (5, 2, 'Jesse', 2, 25.2),
-#    (6, 3, 'Jeroen', 2, 20.2),
-#    (7, 2, 'Jesse', 3, 18.5),
-#]
-#conn.executemany(sql, data)
-
-
 # Print out current time and date
 #print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
-# Add single data
+# Add single data example
 #data_add = (1, 1, 'Bob', strftime("%Y-%m-%d %H:%M:%S", gmtime()), 32.2) # create case to store data
 #conn.execute('INSERT INTO PATIENT_STATS (ID, Patient_ID, Patient_Name, Timestamp, Measurement_ML) values(?, ?, ?, ?, ?)', data_add) # add data in database
 
@@ -156,7 +141,6 @@ if __debug__:
 #delete_Measurement(29.7)
 #get_Patient_ID(1)
 #add_data(2, 'Jesse', 29.5)
-import random
 #add_data(2, 'Jesse', round(random.uniform(15,50),1)) # add data, a float value between 10-50 with 1 decimal 
 print("All items past 24 hours:")
 test = get_24hours(2)
