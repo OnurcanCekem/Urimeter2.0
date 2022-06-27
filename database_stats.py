@@ -1,4 +1,11 @@
-# Program for database
+"""
+ * tkinter_matplot_bar.py
+ *
+ *  Created on: April 4, 2022
+ *  Last update: June 27, 2022
+ *      Author: onurc
+ *  Description: Line graph to illustrate volume measurements.
+ """
 # v1.1 2022-04-11: Changed table, added function to add data or delete data by id and name.
 # v1.2 2022-04-11: added function to delete most recent insert and data by measurement.
 
@@ -143,19 +150,22 @@ if __debug__:
             print(row)
         print("\n")
 #==================================================
-#Do something
+# Do something
 #add_data(2, 'Jesse', 28.1)
 #delete_Name('Onurcan')
 #delete_Measurement(29.7)
 #get_Patient_ID(1)
-add_data(2, 'Jesse', 27.5)
+#add_data(2, 'Jesse', 29.5)
+import random
+#add_data(2, 'Jesse', round(random.uniform(15,50),1)) # add data, a float value between 10-50 with 1 decimal 
 print("All items past 24 hours:")
 test = get_24hours(2)
 for row in test:
     print(row)
 print("New database item added, all good homie.")
 #==================================================
-#Print after something
+# Print after something
+
 if __debug__:
     with conn:
         data = conn.execute("SELECT * FROM PATIENT_STATS")
@@ -163,7 +173,6 @@ if __debug__:
         print("\n\nafter:")
         for row in data:
             print(row)
-        
 #==================================================
 
 

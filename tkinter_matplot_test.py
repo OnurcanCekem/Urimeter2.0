@@ -1,3 +1,11 @@
+"""
+ * tkinter_matplot_bar.py
+ *
+ *  Created on: April 25, 2022
+ *  Last update: June 27, 2022
+ *      Author: onurc
+ *  Description: Line graph to illustrate volume measurements.
+ """
 # Testing tkinter with database
 import sys
 sys.path
@@ -34,7 +42,7 @@ plt.show()
 """
 
 root = tk.Tk() # create tkinter window
-root.geometry("800x480")
+root.geometry("800x480") # windows grootte 
 root.wm_title("Embedding in Tk") # tkinter window title
 
 # Add data to database
@@ -124,12 +132,12 @@ for row in data_base:
     x.append(Timestamp_converted) # add timestamp
     y.append(row[4]) # add volume ; index 4 = volume (ml)
     
-    #debug prints
+    # debug prints
     #print(row) # print all elements in row
     #print(str(row[3]) + " and " + str(row[4])) # print only 'timestamp' and 'measurement'
 
 
-#debug print all values in x and y
+# debug print all values in x and y
 print("\nx vals: ")
 for value in x:
     print(value)
@@ -156,14 +164,18 @@ graph.set_xlabel('Tijd (maand-dag uur)') # set label for x-axis
 graph.set_ylim([0, 50]) # set y-limit to up to 50 ml
 graph.set_xlim([dt.datetime.now() - dt.timedelta(hours=24), dt.datetime.now()]) # set x-limit to up to 24 hours
 
-#Debug time
+# Debug time
 #time_max = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 #time_min = dt.datetime.now() - dt.timedelta(hours=24)
 #time_min_converted = time_min.strftime("%Y-%m-%d %H:%M:%S") # Convert datetime to custom format
 #print("Time_min: " + time_min_converted)
 
-#grid v2
+# grid v1
+#graph.grid(b=True, which='major', color='#666666', linestyle='-') # enable grid
+#graph.minorticks_on()
+#graph.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2) # enable grid
 
+# grid v2
 graph.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d %H")) # recognize grid in date
 graph.xaxis.set_minor_locator(MultipleLocator(1/24)) # minor line each hour
 graph.yaxis.set_major_locator(MultipleLocator(10)) # each 10 ml major line
@@ -178,16 +190,12 @@ if debug:
     graph.xaxis.set_minor_locator(MultipleLocator(1/(24*60))) # uncomment for line each minutes
 
 
-#grid v1
-#graph.grid(b=True, which='major', color='#666666', linestyle='-') # enable grid
-#graph.minorticks_on()
-#graph.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2) # enable grid
 
 # calculate time for limit
 #a.set_xlim([dt.datetime.now() - dt.timedelta(minutes=24), dt.datetime.now()]) # uncomment for 24 minutes version
 
 # Start plotting
-graph.plot(x,y)
+graph.plot(x,y, 'bo-') # 'bo-' means blue color, round points, solid lines
 canvas = FigureCanvasTkAgg(f, master=root)
 canvas.draw()
 canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
@@ -195,6 +203,17 @@ canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 toolbar = NavigationToolbar2Tk(canvas, root)
 toolbar.update()
 canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+# Data labels
+for x,y in zip(x,y):
+
+    label = "{:.1f}".format(y) # 1 decimal
+
+    graph.annotate(label, # this is the text
+                 (x,y), # these are the coordinates to position the label
+                 textcoords="offset points", # how to position the text
+                 xytext=(0,5), # distance from text to points (x,y)
+                 ha='center') # horizontal alignment can be left, right or center
 
 canvas.mpl_connect("key_press_event", on_key_press)
 
