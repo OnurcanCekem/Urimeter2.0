@@ -2,10 +2,11 @@
  * database_stats.py
  *
  *  Created on: April 4, 2022
- *  Last update: June 27, 2022
+ *  Last update: June 30, 2022
  *      Author: onurc
  *  Description: Program with database functionality. Can uncomment for creating database and outputting debug values. 
-                 Mainly used for adding data to existing database.
+                 Mainly used for understanding the existing database.
+                To get started look at the following: create database and create table.
  """
 # v1.1 2022-04-11: Changed table, added function to add data or delete data by id and name.
 # v1.2 2022-04-11: added function to delete most recent insert and data by measurement.
@@ -92,13 +93,21 @@ def get_Measurement(Measurement):
     data = conn.execute("SELECT * FROM PATIENT_STATS WHERE Measurement_ML=?", (Measurement,)) # retrieve all rows with Patient_ID
     return data
 
+# Get the most recent insert from the database.
+def get_Latest():
+    data = conn.execute("SELECT * FROM PATIENT_STATS WHERE ID=(SELECT MAX(ID) FROM PATIENT_STATS)") # retrieve all rows with Patient_ID
+    return data
+
 # Get all measurements in the past 24 hours from given Patient ID.
 # Parameter Patient_ID: The ID of a patient
 def get_24hours(Patient_ID):
     data = conn.execute("SELECT * FROM PATIENT_STATS WHERE Timestamp > datetime('now', '-1 day') AND Patient_ID=?", (Patient_ID,)) # retrieve all rows in the past 24hrs with Patient_ID
     return data
 
-# IDK what to do with this one
+# ==============================================================
+# Create database file
+# ==============================================================
+# Create database file if it doesn't exist. Uncomment to create this file if you don't have one.
 #if __name__ == '__main__':
     #create_connection(r"C:\sqlite\db\pythonsqlite.db")
     #create_connection(r"db_test.db") # Creates connection to database. Creates a new database file if file does not exist.
@@ -106,7 +115,10 @@ def get_24hours(Patient_ID):
 
 conn = sqlite3.connect(r"db_test.db") # Connect to the database
 
-# Uncomment to create database
+# ==============================================================
+# Create table
+# ==============================================================
+# Uncomment to create table. Run it once, or it generates errors as it tries to make another table when it already exists.
 #with conn:
 #    conn.execute("""
 #        CREATE TABLE PATIENT_STATS (
@@ -141,7 +153,7 @@ if __debug__:
 #delete_Measurement(29.7)
 #get_Patient_ID(1)
 #add_data(2, 'Jesse', 29.5)
-#add_data(2, 'Jesse', round(random.uniform(15,50),1)) # add data, a float value between 10-50 with 1 decimal 
+add_data(2, 'Jesse', round(random.uniform(15,50),1)) # add data, a float value between 10-50 with 1 decimal 
 print("All items past 24 hours:")
 test = get_24hours(2)
 for row in test:
