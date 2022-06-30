@@ -1,13 +1,12 @@
 """
  * tkinter_keypad_database.py
  *
- *  Created on: June, 2022
+ *  Created on: June 27, 2022
  *  Last update: June 27, 2022
  *      Author: onurc
- *  Description: Tkinter test program for keypad to test the lambda function.
+ *  Description: Tkinter keypad program to use with database. Can add and delete values from database.
+                 Used for adding and deleting data through manual key input.
  """
-
-
 
 # Keypad imports
 from tkinter import *
@@ -22,6 +21,8 @@ from time import gmtime, strftime
 import datetime
 conn = None # Variable to use as connection with the database
 
+
+import time # required for time of program
 #===============================================================
 # Database
 #===============================================================
@@ -98,6 +99,11 @@ def get_Measurement(Measurement):
     data = conn.execute("SELECT * FROM PATIENT_STATS WHERE Measurement_ML=?", (Measurement,)) # retrieve all rows with Patient_ID
     return data
 
+# Get the most recent insert from the database.
+def get_Latest():
+    data = conn.execute("SELECT * FROM PATIENT_STATS WHERE ID=(SELECT MAX(ID) FROM PATIENT_STATS)") # retrieve all rows with Patient_ID
+    return data
+
 # Get all measurements in the past 24 hours from given Patient ID.
 # Parameter Patient_ID: The ID of a patient
 def get_24hours(Patient_ID):
@@ -135,14 +141,13 @@ create_connection(r"db_test.db") # Creates connection to database. Creates a new
 def buttonPressed(button):
     global index
     #print("Hello there button " + str(button))
-    print("index: " + str(index))
 
     # Keypad 1-9
     if(button >= 1) and (button <= 9):
-        print("Keypad 1")
         input_entry.insert(index,str(button))
         index = index + 1
     
+    # . for decimals
     elif(button == 10):
         print(".")
         input_entry.insert(index,".")
@@ -157,39 +162,72 @@ def buttonPressed(button):
     
     # Add data to database button
     elif(button == 12):
-        print("add data value: " + input_entry.get())
-        print("add data value: " + str(float(input_entry.get())))
-        # add the data to database
-        data = "{:.1f}".format(float(input_entry.get()))
-        add_data(2, 'Jesse', data) # add data, a float value between 10-50 with 1 decimal 
-        #add_data(2, 'Jesse', round(random.uniform(15,50),1)) # add data, a float value between 10-50 with 1 decimal 
+        #print("add data value: " + str(float(input_entry.get()))) # debug what the input entry has
+        data = "{:.1f}".format(float(input_entry.get())) # Convert string to float with 1 decimal
+        add_data(2, 'Jesse', data) # add data 
+        #add_data(2, 'Jesse', round(random.uniform(15,50),1)) # uncomment for data example
+
+        # Establish connection. This is needed or the added data won't save.
         with conn:
             data = conn.execute("SELECT * FROM PATIENT_STATS")
-        for i in range(0,index): # clear selection
+        for i in range(0,index): # clear selection from input entry
             input_entry.delete(0)
-        index = 0
+        index = 0 # reset index
+        database_data = get_Latest()
+        print("Added data with the following results")
+        for row in database_data:
+            print(row)
 
     # Delete last data from database button
     elif(button == 13):
-        print("delete, IDK")
-        delete_Latest()
+        delete_Latest() # Delete the data entry
+
+        # Establish connection. This is needed or the added data won't save.
+        with conn:
+            data = conn.execute("SELECT * FROM PATIENT_STATS")
+    print("index: " + str(index))
 
 root.title("Keypad")
-btn1=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new rmoan',30,'bold'),command=lambda: buttonPressed(1), text='1').grid(row=4,column=0)
-btn2=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new rmoan',30,'bold'),command=lambda: buttonPressed(2), text='2').grid(row=4,column=1)
-btn3=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new rmoan',30,'bold'),command=lambda: buttonPressed(3), text='3').grid(row=4,column=2)
-btn4=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new rmoan',30,'bold'),command=lambda: buttonPressed(4), text='4').grid(row=3,column=0)
-btn5=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new rmoan',30,'bold'),command=lambda: buttonPressed(5), text='5').grid(row=3,column=1)
-btn6=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new rmoan',30,'bold'),command=lambda: buttonPressed(6), text='6').grid(row=3,column=2)
-btn7=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new rmoan',30,'bold'),command=lambda: buttonPressed(7), text='7').grid(row=2,column=0)
-btn8=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new rmoan',30,'bold'),command=lambda: buttonPressed(8), text='8').grid(row=2,column=1)
-btn9=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new rmoan',30,'bold'),command=lambda: buttonPressed(9), text='9').grid(row=2,column=2)
-btn9=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new rmoan',30,'bold'),command=lambda: buttonPressed(10), text='.').grid(row=4,column=4)
 
-delete_btn =Button(root,padx=8,pady=15,bd=5,bg='white',fg='blue',font=('times new rmoan',20,'bold'),command=lambda: buttonPressed(11), text='clear karakter').grid(row=2,column=4)
-adddata_btn=Button(root,padx=8,pady=15,bd=5,bg='green',fg='blue',font=('times new rmoan',15,'bold'),command=lambda: buttonPressed(12), text='toevoegen invoer data').grid(row=1,column=4)
-deletedata_btn =Button(root,padx=8,pady=15,bd=5,bg='red',fg='blue',font=('times new rmoan',12,'bold'),command=lambda: buttonPressed(13), text='verwijder laatste data').grid(row=0,column=4)
-destroy_btn = Button(root,padx=8,pady=15,bd=5,bg='white',fg='blue',font=('times new rmoan',12,'bold'),command=lambda: root.destroy(), text='Schakel naar grafiek').grid(row=4,column=5)
+# Buttons for keypad
+btn1=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new roman',30,'bold'),command=lambda: buttonPressed(1), text='1').grid(row=4,column=0)
+btn2=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new roman',30,'bold'),command=lambda: buttonPressed(2), text='2').grid(row=4,column=1)
+btn3=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new roman',30,'bold'),command=lambda: buttonPressed(3), text='3').grid(row=4,column=2)
+btn4=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new roman',30,'bold'),command=lambda: buttonPressed(4), text='4').grid(row=3,column=0)
+btn5=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new roman',30,'bold'),command=lambda: buttonPressed(5), text='5').grid(row=3,column=1)
+btn6=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new roman',30,'bold'),command=lambda: buttonPressed(6), text='6').grid(row=3,column=2)
+btn7=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new roman',30,'bold'),command=lambda: buttonPressed(7), text='7').grid(row=2,column=0)
+btn8=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new roman',30,'bold'),command=lambda: buttonPressed(8), text='8').grid(row=2,column=1)
+btn9=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new roman',30,'bold'),command=lambda: buttonPressed(9), text='9').grid(row=2,column=2)
+btn9=Button(root,padx=8,pady=8,bd=5,bg='white',fg='blue',font=('times new roman',30,'bold'),command=lambda: buttonPressed(10), text='.').grid(row=4,column=4)
+
+clear_btn       =Button(root,padx=8,pady=15,bd=5,bg='white',fg='blue',font=('times new roman',20,'bold'),command=lambda: buttonPressed(11), text='clear karakter').grid(row=2,column=4)
+adddata_btn     =Button(root,padx=8,pady=15,bd=5,bg='green',fg='blue',font=('times new roman',15,'bold'),command=lambda: buttonPressed(12), text='toevoegen invoer meting').grid(row=1,column=4)
+deletedata_btn  =Button(root,padx=8,pady=15,bd=5,bg='red',fg='blue',font=('times new roman',15,'bold'),command=lambda: buttonPressed(13), text='verwijder laatste meting').grid(row=0,column=4)
+destroy_btn     =Button(root,padx=8,pady=15,bd=5,bg='white',fg='blue',font=('times new roman',12,'bold'),command=lambda: root.destroy(), text='Schakel naar grafiek').grid(row=4,column=5)
+
+
+# #==========================
+# starttime = int(time.perf_counter_ns() / 1000000000) # start time of program
+# print(starttime)
+
+# count1 = 0
+    
+# # If a certain time has passed
+# while(True):
+#     currenttime_seconds = int(time.perf_counter_ns() / 1000000000) - starttime # Counts in seconds
+#     if(currenttime_seconds == 60):
+#         # Do something
+#         count1 += 1
+#         print("do something, IDK " + str(count1))
+#         add_data(2, 'Jesse', round(random.uniform(15,50),1)) # uncomment for data example
+        
+#         with conn: # Establish connection. This is needed or the added data won't save.
+#             data = conn.execute("SELECT * FROM PATIENT_STATS")
+#         #uncomment the line below to reset the timer
+#         starttime = int(time.perf_counter_ns() / 1000000000) # Reset the timer
+# #==========================
+
 root.mainloop()
 conn.close() # close connection with database
 
